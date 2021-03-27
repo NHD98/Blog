@@ -35,9 +35,9 @@ public class User implements UserDetails{
 	private String password;
 	@Column(name = "full_name")
 	private String fullName;
+	private String roles;
 	@Builder.Default
 	private boolean status = true;
-	private String roles;
 	@Builder.Default
 	private boolean expired = false;
 	@Builder.Default

@@ -1,19 +1,25 @@
 package com.petproject.blog.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.petproject.blog.dto.JwtRequest;
+import com.petproject.blog.dto.UserRegister;
+import com.petproject.blog.model.User;
 import com.petproject.blog.security.JwtTokenUtil;
 import com.petproject.blog.service.JwtUserDetailsService;
 
@@ -50,5 +56,21 @@ public class JwtAuthenticationController {
 		} catch (BadCredentialsException e) {
 			throw new Exception("INVALID_CREDENTIALS", e);
 		}
+	}
+
+	@PostMapping("/register")
+	public ResponseEntity<String> registerUser(@RequestBody UserRegister userRegister) {
+		ResponseEntity<String> response;
+		if (!userRegister.getPassword().equals(userRegister.getConfirmPassword())) {
+			response = new ResponseEntity<String>("Passwords are not match", HttpStatus.BAD_REQUEST);
+		} else if (userDetailsService.getUserByUsername(userRegister.getUsername()) != null) {
+			response = new ResponseEntity<String>("Username existed", HttpStatus.BAD_REQUEST);
+		} else {
+			int result = userDetailsService.register(userRegister);
+			response = result > 0 ? new ResponseEntity<String>("New User is created", HttpStatus.OK)
+					: new ResponseEntity<String>("Error on creating new User", HttpStatus.BAD_REQUEST);
+		}
+		return response;
+
 	}
 }

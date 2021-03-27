@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.petproject.blog.dto.JwtRequest;
+import com.petproject.blog.dto.UserRegister;
 import com.petproject.blog.model.User;
 import com.petproject.blog.repository.UserRepository;
 
@@ -32,14 +35,24 @@ public class JwtUserDetailsService implements UserDetailsService {
 		}
 	}
 
-	public int register(User user) {
+	public int register(UserRegister userRegister) {
+		
+		PasswordEncoder encoder = new BCryptPasswordEncoder();
+		User user = new User();
+		user.setEmail(userRegister.getEmail());
+		user.setFullName(userRegister.getFullName());
+		user.setPassword(encoder.encode(userRegister.getPassword()));
+		user.setRoles("USER");
+		user.setUsername(userRegister.getUsername());
+		System.out.println(user.getPassword());
+		
 		int result = userRepository.register(user.getUsername(), user.getPassword(), user.isStatus(), user.getEmail(),
-				user.getFullName(), user.getRoles());
+				user.getFullName(), user.getRoles(), user.isExpired(), user.isLocked(), user.isEnable());
 		return result;
 	}
-
-	public String login(JwtRequest userLogin) {
-		return null;
+	
+	public User getUserByUsername(String username) {
+		return userRepository.findByUsername(username).get();
 	}
 
 }
