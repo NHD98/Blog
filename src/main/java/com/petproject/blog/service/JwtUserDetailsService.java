@@ -36,7 +36,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 	}
 
 	public int register(UserRegister userRegister) {
-		
+
 		PasswordEncoder encoder = new BCryptPasswordEncoder();
 		User user = new User();
 		user.setEmail(userRegister.getEmail());
@@ -45,14 +45,9 @@ public class JwtUserDetailsService implements UserDetailsService {
 		user.setRoles("USER");
 		user.setUsername(userRegister.getUsername());
 		System.out.println(user.getPassword());
-		
+
 		int result = userRepository.register(user.getUsername(), user.getPassword(), user.isStatus(), user.getEmail(),
 				user.getFullName(), user.getRoles(), user.isExpired(), user.isLocked(), user.isEnable());
 		return result;
 	}
-	
-	public User getUserByUsername(String username) {
-		return userRepository.findByUsername(username).get();
-	}
-
 }

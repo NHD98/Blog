@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.petproject.blog.model.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>{
+public interface UserRepository extends JpaRepository<User, Long> {
 	@Query(value = "SELECT * FROM user WHERE id = :id", nativeQuery = true)
 	public Optional<User> findById(@Param("id") int id);
 
@@ -25,5 +25,11 @@ public interface UserRepository extends JpaRepository<User, Long>{
 	@Transactional(rollbackFor = Exception.class)
 	@Modifying
 	@Query(value = "insert into user(username, password, status, email, full_name, roles, expired, locked, enable) values (:username, :password, :status, :email, :fullName, :roles, :expired, :locked, :enable)", nativeQuery = true)
-	public int register(@Param("username") String username, @Param("password") String password, @Param("status") boolean status, @Param("email") String email, @Param("fullName") String fullName, @Param("roles") String roles, @Param("expired") boolean expired, @Param("locked") boolean locked, @Param("enable") boolean enable);
+	public int register(@Param("username") String username, @Param("password") String password,
+			@Param("status") boolean status, @Param("email") String email, @Param("fullName") String fullName,
+			@Param("roles") String roles, @Param("expired") boolean expired, @Param("locked") boolean locked,
+			@Param("enable") boolean enable);
+
+	@Query(value = "SELECT id FROM user WHERE username = :username", nativeQuery = true)
+	public long getIdByUsername(@Param("username") String username);
 }
